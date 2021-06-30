@@ -1,3 +1,5 @@
+#!/bin/bash
+
 ACTIONS=(run start test xcodeproj_schemes pod_lint pod_deploy)
 XCODE_DESTINATION="platform=iOS Simulator,OS=14.5,name=iPhone 8"
 VERSION=0.0.1

@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # OUTPUT_DIR=$(mktemp -d -t xchelper-release)
 
 ROOT_PATH=`pwd`
