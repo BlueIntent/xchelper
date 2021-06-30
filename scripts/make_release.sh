@@ -2,6 +2,7 @@
 
 ROOT_PATH=`pwd`
 BUILD_PATH=$ROOT_PATH/build
+PACKAGE_PATH=$BUILD_PATH/package
 RELEASE_PATH=$BUILD_PATH/release
 PRODUCTS_PATH=${ROOT_PATH}/build/products
 
@@ -14,10 +15,14 @@ BIN_ZIP_PATH=$RELEASE_PATH/$BIN_ZIP_NAME
 rm -rf $BUILD_PATH
 mkdir -p $PRODUCTS_PATH
 
+# package
+mkdir -p $PACKAGE_PATH
+cp -P xchelper.sh $PACKAGE_PATH/xchelper
+chmod 777 $PACKAGE_PATH/xchelper
+
 # bin zip
 mkdir -p $BIN_ZIP_PATH
-cp -P xchelper.sh $BIN_ZIP_PATH/xchelper
-chmod 777 $BIN_ZIP_PATH/xchelper
+rsync -r $PACKAGE_PATH/* $BIN_ZIP_PATH
 cd ${RELEASE_PATH} && zip -r -q $PRODUCTS_PATH/$BIN_ZIP_NAME.zip $BIN_ZIP_NAME && cd $ROOT_PATH
 
 # code zip 
