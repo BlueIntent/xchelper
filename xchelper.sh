@@ -94,7 +94,7 @@ function get_gemfile_directory() {
   # 默认使用查到到的第一个 Gemfile
   if [ ${#gemfile_paths[@]} -gt 0 ]; then
     gemfile_path=${gemfile_paths[0]}
-    XCODE_GEMFILE_DIRECTORY=`dirname ${gemfile_path}`
+    XCODE_GEMFILE_DIRECTORY=$(dirname ${gemfile_path})
   fi
 }
 
@@ -102,7 +102,7 @@ function get_podfile_directory() {
   podfile_paths=($(find ./ -name Podfile))
   # 默认使用查到到的第一个 Podfile
   podfile_path=${podfile_paths[0]}
-  XCODE_PROFILE_DIRECTORY=`dirname ${podfile_path}`
+  XCODE_PROFILE_DIRECTORY=$(dirname ${podfile_path})
 }
 
 ######################
