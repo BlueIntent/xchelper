@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# OUTPUT_DIR=$(mktemp -d -t xchelper-release)
-
 ROOT_PATH=$(pwd)
 BUILD_PATH=$ROOT_PATH/build
 PACKAGE_PATH=$BUILD_PATH/package
