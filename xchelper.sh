@@ -57,7 +57,7 @@ function setup_xcodeproj() {
 
 function get_xcodeproj_workspace() {
   if [ -z $XCODE_WORKSPACE ]; then
-    workspaces=($(find ./ -name "*.xcworkspace"))
+    workspaces=($(find $PWD/ -name "*.xcworkspace" | awk '{print length($0), $0}' | sort -n | awk '{print $2}'))
     XCODE_WORKSPACE=${workspaces[0]}
   fi
 }
@@ -90,7 +90,7 @@ function get_xcodeproj_xctest_schemes() {
 }
 
 function get_gemfile_directory() {
-  gemfile_paths=($(find ./ -name Gemfile | awk '{print length($0), $0}' | sort -n | awk '{print $2}'))
+  gemfile_paths=($(find $PWD/ -name Gemfile | awk '{print length($0), $0}' | sort -n | awk '{print $2}'))
   # 默认使用查到到的第一个 Gemfile
   if [ ${#gemfile_paths[@]} -gt 0 ]; then
     gemfile_path=${gemfile_paths[0]}
@@ -99,7 +99,7 @@ function get_gemfile_directory() {
 }
 
 function get_podfile_directory() {
-  podfile_paths=($(find ./ -name Podfile))
+  podfile_paths=($(find $PWD/ -name Podfile))
   # 默认使用查到到的第一个 Podfile
   podfile_path=${podfile_paths[0]}
   XCODE_PROFILE_DIRECTORY=$(dirname ${podfile_path})
