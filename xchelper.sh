@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ACTIONS=(run start test xcodeproj_schemes pod_lint pod_deploy)
+ACTIONS=(install run test xcodeproj_schemes pod_lint pod_deploy)
 XCODE_DESTINATION="platform=iOS Simulator,OS=14.5,name=iPhone 8"
 VERSION=0.0.1
 
@@ -12,10 +12,10 @@ SYNOPSIS:
 xchelper [action ...] [-w] [Build workspace path option]
   
 Actions:
+  install
+      Install project dependencies
   run
-      Build an Xcode project.
-  start
-      Build an Xcode project, and open workspace.
+      Install project dependencies, and open workspace.
   test
       Test a scheme from the build root (SYMROOT).  This requires specifying a scheme and optionally a destination.
   xcodeproj_schemes
@@ -108,7 +108,7 @@ function get_podfile_directory() {
 ######################
 ## Actions
 
-function run() {
+function install() {
   get_gemfile_directory
   if [ $XCODE_GEMFILE_DIRECTORY ]; then
     bundle install --verbose
@@ -120,8 +120,8 @@ function run() {
   pod install --project-directory=${XCODE_PROFILE_DIRECTORY} --verbose
 }
 
-function start() {
-  run
+function run() {
+  install
   open $XCODE_WORKSPACE
 }
 

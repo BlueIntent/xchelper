@@ -13,7 +13,12 @@ brew install xchelper
 
 ## Usage
 
-build an Xcode project
+install project dependencies.
+```bash 
+xchelper install
+```
+
+install project dependencies, and open workspace.
 ```bash 
 xchelper run
 ```
