@@ -2,7 +2,9 @@
 
 [![License](https://img.shields.io/github/license/blueintent/xchelper)](https://github.com/blueintent/xchelper/blob/main/LICENSE)
 
-__xchelper__ is a tool for iOS developers to automate tedious tasks like run, test.
+__xchelper__ is a tool for iOS developers to automate tedious tasks like install, run, test.
+
+[中文文档](./README_cn.md)
 
 ## Installation
 

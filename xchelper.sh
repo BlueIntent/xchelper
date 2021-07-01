@@ -6,7 +6,7 @@ VERSION=0.0.1
 
 usage() {
   cat <<EOF
-Usage: A tool for iOS developers to automate tedious tasks like run, test.
+Usage: A tool for iOS developers to automate tedious tasks like install, run, test.
 
 SYNOPSIS:
 xchelper [action ...] [-w] [Build workspace path option]
