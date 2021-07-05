@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ACTIONS=(install run test xcodeproj_schemes swiftlint pod_lint pod_deploy)
+ACTIONS=(install run test xcodeproj-schemes swiftlint pod-lib-lint pod-trunk-deploy)
 XCODE_DESTINATION="platform=iOS Simulator,OS=14.5,name=iPhone 8"
 VERSION=0.0.1
 
@@ -18,11 +18,11 @@ Actions:
       Install project dependencies, and open workspace.
   test
       Test a scheme from the build root (SYMROOT).  This requires specifying a scheme and optionally a destination.
-  xcodeproj_schemes
+  xcodeproj-schemes
       To list all available schemes for the project in your current directory.
-  pod_lint
+  pod-lib-lint
       Validates a Pod.
-  pod_deploy
+  pod-trunk-deploy
       Publish a podspec.
 
 Parameters:
@@ -133,7 +133,7 @@ function test() {
   done
 }
 
-function xcodeproj_schemes() {
+function xcodeproj-schemes() {
   get_xcodeproj_schemes
 
   echo ${XCODE_SCHEMES[@]}
@@ -149,11 +149,11 @@ function swiftlint()
   fi
 }
 
-function pod_lint() {
-  pod lib lint --verbose
+function pod-lib-lint() {
+  pod lib lint --allow-warnings --verbose
 }
 
-function pod_deploy() {
+function pod-trunk-deploy() {
   pod trunk push *.podspec --allow-warnings --verbose
 }
 
