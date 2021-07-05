@@ -129,7 +129,7 @@ function test() {
   get_xcodeproj_xctest_schemes
 
   for scheme in ${XCODE_XCTEST_SCHEMES[@]}; do
-    set -o pipefail | xcodebuild -workspace $XCODE_WORKSPACE -scheme $scheme -destination "$XCODE_DESTINATION" build test | xcpretty
+    set -o pipefail && xcodebuild clean test -workspace $XCODE_WORKSPACE -scheme $scheme -destination "$XCODE_DESTINATION" | xcpretty
   done
 }
 
