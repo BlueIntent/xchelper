@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ACTIONS=(install run test xcodeproj_schemes pod_lint pod_deploy)
+ACTIONS=(install run test xcodeproj_schemes swiftlint pod_lint pod_deploy)
 XCODE_DESTINATION="platform=iOS Simulator,OS=14.5,name=iPhone 8"
 VERSION=0.0.1
 
@@ -139,8 +139,18 @@ function xcodeproj_schemes() {
   echo ${XCODE_SCHEMES[@]}
 }
 
+function swiftlint()
+{
+  echo "swiftlint ..."
+  if which swiftlint >/dev/null; then
+    command swiftlint
+  else 
+    echo "warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint"
+  fi
+}
+
 function pod_lint() {
-  pod lib lint --allow-warnings --verbose
+  pod lib lint --verbose
 }
 
 function pod_deploy() {
