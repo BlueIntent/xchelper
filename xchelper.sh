@@ -1,8 +1,7 @@
 #!/bin/bash
 
-ACTIONS=(install run test xcodeproj-schemes swiftlint pod-lib-lint pod-trunk-deploy)
-XCODE_DESTINATION="platform=iOS Simulator,OS=14.5,name=iPhone 8"
 VERSION=0.0.1
+ACTIONS=(install run test xcodeproj-schemes swiftlint pod-lib-lint pod-trunk-deploy)
 
 usage() {
   cat <<EOF
@@ -52,7 +51,16 @@ version() {
 }
 
 function setup_xcodeproj() {
+  get_xcode_destination
   get_xcodeproj_workspace
+}
+
+function get_xcode_destination() {
+  if [ -z $XCODE_DESTINATION ]; then
+    local device_name=`xcrun xctrace list devices 2>&1 | grep -oE 'iPhone.*?[^\(]+' | head -1 | awk '{$1=$1;print}'`
+    XCODE_DESTINATION="platform=iOS Simulator,name=$device_name"
+    echo $XCODE_DESTINATION
+  fi
 }
 
 function get_xcodeproj_workspace() {
