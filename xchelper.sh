@@ -50,9 +50,42 @@ version() {
   exit 0
 }
 
+# Color
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+NC='\033[0m' # No Color
+
+function sh() {
+  printf "${GREEN}$ $@${NC}\n"
+  $@
+}
+
+function action() {
+  echo "------------------------"
+  printf "${GREEN}Action: $@${NC}\n"
+  echo "------------------------"
+}
+
+function warning() {
+  printf "${YELLOW}warning: $@${NC}\n"
+}
+
 function setup_xcodeproj() {
   get_xcode_destination
   get_xcodeproj_workspace
+}
+
+function install_project_dependencies() {
+  get_gemfile_directory
+  if [ $XCODE_GEMFILE_DIRECTORY ]; then
+    sh bundle install --verbose
+    sh bundle exec rake
+    return
+  fi
+
+  get_podfile_directory
+  sh pod install --project-directory=${XCODE_PROFILE_DIRECTORY} --verbose
 }
 
 function get_xcode_destination() {
@@ -116,27 +149,22 @@ function get_podfile_directory() {
 ## Actions
 
 function install() {
-  get_gemfile_directory
-  if [ $XCODE_GEMFILE_DIRECTORY ]; then
-    bundle install --verbose
-    bundle exec rake
-    return
-  fi
-
-  get_podfile_directory
-  pod install --project-directory=${XCODE_PROFILE_DIRECTORY} --verbose
+  action "${FUNCNAME[0]} ..."
+  install_project_dependencies
 }
 
 function run() {
-  install
-  open $XCODE_WORKSPACE
+  action "${FUNCNAME[0]} ..."
+  install_project_dependencies
+  sh open $XCODE_WORKSPACE
 }
 
 function test() {
+  action "${FUNCNAME[0]} ..."
   get_xcodeproj_xctest_schemes
 
   for scheme in ${XCODE_XCTEST_SCHEMES[@]}; do
-    set -o pipefail && xcodebuild clean test -workspace $XCODE_WORKSPACE -scheme $scheme -destination "$XCODE_DESTINATION" | xcpretty
+    sh set -ox pipefail && xcodebuild clean test -workspace $XCODE_WORKSPACE -scheme $scheme -destination "$XCODE_DESTINATION" | xcpretty
   done
 }
 
@@ -147,28 +175,30 @@ function xcodeproj-schemes() {
 }
 
 function swiftlint() {
-  echo "swiftlint ..."
+  action "${FUNCNAME[0]} ..."
   if which swiftlint >/dev/null; then
     if [ -e .swiftlint.yml ]; then
-      command swiftlint lint --strict
+      sh command swiftlint lint --strict
     else
-      echo "warning: No such file or directory: '.swiftlint.yml', skipping ..."
+      warning "No such file or directory: '.swiftlint.yml', skipping ..."
     fi
   else 
-    echo "warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint"
+    warning "SwiftLint not installed, download from https://github.com/realm/SwiftLint"
   fi
 }
 
 function pod-lib-lint() {
+  action "${FUNCNAME[0]} ..."
   if [ -e *.podspec ]; then
-    pod lib lint --allow-warnings --verbose
+    sh pod lib lint --allow-warnings --verbose
   else
-    echo "warning: No such file or directory: '*.podspec', skipping ..."
+    warning "No such file or directory: '*.podspec', skipping ..."
   fi
 }
 
 function pod-trunk-deploy() {
-  pod trunk push *.podspec --allow-warnings --verbose
+  action "${FUNCNAME[0]} ..."
+  sh pod trunk push *.podspec --allow-warnings --verbose
 }
 
 ######################
