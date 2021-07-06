@@ -147,11 +147,14 @@ function xcodeproj-schemes() {
   echo ${XCODE_SCHEMES[@]}
 }
 
-function swiftlint()
-{
+function swiftlint() {
   echo "swiftlint ..."
   if which swiftlint >/dev/null; then
-    command swiftlint
+    if [ -e .swiftlint.yml ]; then
+      command swiftlint lint --strict
+    else
+      echo "warning: No such file or directory: '.swiftlint.yml', skipping ..."
+    fi
   else 
     echo "warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint"
   fi
