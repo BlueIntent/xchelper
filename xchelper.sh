@@ -59,7 +59,6 @@ function get_xcode_destination() {
   if [ -z $XCODE_DESTINATION ]; then
     local device_name=`xcrun xctrace list devices 2>&1 | grep -oE 'iPhone.*?[^\(]+' | head -1 | awk '{$1=$1;print}'`
     XCODE_DESTINATION="platform=iOS Simulator,name=$device_name"
-    echo $XCODE_DESTINATION
   fi
 }
 
@@ -161,7 +160,11 @@ function swiftlint() {
 }
 
 function pod-lib-lint() {
-  pod lib lint --allow-warnings --verbose
+  if [ -e *.podspec ]; then
+    pod lib lint --allow-warnings --verbose
+  else
+    echo "warning: No such file or directory: '*.podspec', skipping ..."
+  fi
 }
 
 function pod-trunk-deploy() {
