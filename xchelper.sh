@@ -72,10 +72,11 @@ function warning() {
 }
 
 function info() {
-  printf "info: $@"
+  echo "info: $@"
 }
 
 function setup_xcodeproj() {
+  XCODE_DERIVED_DATA_PATH=$PWD/build
   get_xcode_destination
   get_xcodeproj_workspace
 }
@@ -150,6 +151,31 @@ function get_podfile_directory() {
   XCODE_PROFILE_DIRECTORY=$(dirname ${podfile_path})
 }
 
+function build_for_testing() {
+  get_xcodeproj_xctest_schemes
+
+  if [ ${#XCODE_XCTEST_SCHEMES[@]} -eq 0 ]; then
+    warning "No such xctest scheme, skipping ..."
+    exit 0
+  fi
+
+  for scheme in ${XCODE_XCTEST_SCHEMES[@]}; do
+    sh set -ox pipefail && xcodebuild build-for-testing -workspace $XCODE_WORKSPACE -scheme $scheme -destination "$XCODE_DESTINATION" -derivedDataPath 'build/' | xcpretty
+  done
+}
+
+function test_without_building() {
+  local xctestrun_files=( $(find $XCODE_DERIVED_DATA_PATH -name *.xctestrun) )
+  if [ ${#xctestrun_files[@]} -eq 0 ]; then
+    warning "No such xctest run file, skipping ..."
+    exit 0
+  fi
+
+  # 默认使用第一个 xctest run file
+  local xctestrun_file=${xctestrun_files[0]}
+  sh set -ox pipefail && xcodebuild test-without-building -xctestrun $xctestrun_file -destination "$XCODE_DESTINATION" | xcpretty
+}
+
 ######################
 ## Actions
 
@@ -166,16 +192,8 @@ function run() {
 
 function test() {
   action "${FUNCNAME[0]} ..."
-  get_xcodeproj_xctest_schemes
-
-  if [ ${#XCODE_XCTEST_SCHEMES[@]} -gt 0 ]; then
-    warning "No such xctest scheme, skipping ..."
-    exit 0
-  fi
-
-  for scheme in ${XCODE_XCTEST_SCHEMES[@]}; do
-    sh set -ox pipefail && xcodebuild clean test -workspace $XCODE_WORKSPACE -scheme $scheme -destination "$XCODE_DESTINATION" | xcpretty
-  done
+  build_for_testing
+  test_without_building
 }
 
 function xcodeproj-schemes() {
