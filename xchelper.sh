@@ -71,6 +71,10 @@ function warning() {
   printf "${YELLOW}warning: $@${NC}\n"
 }
 
+function info() {
+  printf "info: $@"
+}
+
 function setup_xcodeproj() {
   get_xcode_destination
   get_xcodeproj_workspace
@@ -104,7 +108,7 @@ function get_xcodeproj_workspace() {
 
 function get_xcodeproj_schemes() {
   if [ -z $XCODE_SCHEMES ]; then
-    XCODE_SCHEMES=($(xcodebuild -workspace */*.xcworkspace -list 2>/dev/null | sed '1,/Schemes:/d' | grep -v CordovaLib | sed -e 's/^[ \t]*//'))
+    XCODE_SCHEMES=($(echo `xcodebuild -workspace $XCODE_WORKSPACE -list -json` | ruby -e "require 'json'; puts JSON.parse(STDIN.gets)['workspace']['schemes']"))
   fi
 }
 
@@ -117,10 +121,11 @@ function get_xcodeproj_scheme() {
 }
 
 function get_xcodeproj_xctest_schemes() {
+  info "get xcodeproj xctest schemes ..."
   get_xcodeproj_schemes
   for scheme in ${XCODE_SCHEMES[@]}; do
-    local xctest_count=$(xcodebuild -workspace */*.xcworkspace -scheme $scheme -showBuildSettings | grep WRAPPER_EXTENSION | grep -c xctest)
-    if [ $xctest_count -gt 0 ]; then
+    local test_host_list=( $(echo `xcodebuild -workspace $XCODE_WORKSPACE -scheme $scheme -showBuildSettings -json` | ruby -e "require 'json'; puts JSON.parse(STDIN.gets).map { |value| value['buildSettings']['TEST_HOST'] }.reject { |value| value.to_s.empty? }") )
+    if [ ${#test_host_list[@]} -gt 0 ]; then
       if [ -z $XCODE_XCTEST_SCHEMES ]; then
         XCODE_XCTEST_SCHEMES=()
         XCODE_XCTEST_SCHEMES[${#XCODE_XCTEST_SCHEMES[@]}]=$scheme
@@ -162,6 +167,11 @@ function run() {
 function test() {
   action "${FUNCNAME[0]} ..."
   get_xcodeproj_xctest_schemes
+
+  if [ ${#XCODE_XCTEST_SCHEMES[@]} -gt 0 ]; then
+    warning "No such xctest scheme, skipping ..."
+    exit 0
+  fi
 
   for scheme in ${XCODE_XCTEST_SCHEMES[@]}; do
     sh set -ox pipefail && xcodebuild clean test -workspace $XCODE_WORKSPACE -scheme $scheme -destination "$XCODE_DESTINATION" | xcpretty
