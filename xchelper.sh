@@ -61,10 +61,8 @@ function sh() {
   $@
 }
 
-function action() {
-  echo "------------------------"
-  printf "${GREEN}Action: $@${NC}\n"
-  echo "------------------------"
+function logger_cmd() {
+  printf "${GREEN}$@${NC}\n"
 }
 
 function warning() {
@@ -180,18 +178,15 @@ function test_without_building() {
 ## Actions
 
 function install() {
-  action "${FUNCNAME[0]} ..."
   install_project_dependencies
 }
 
 function run() {
-  action "${FUNCNAME[0]} ..."
   install_project_dependencies
   sh open $XCODE_WORKSPACE
 }
 
 function test() {
-  action "${FUNCNAME[0]} ..."
   build_for_testing
   test_without_building
 }
@@ -203,7 +198,6 @@ function xcodeproj-schemes() {
 }
 
 function swiftlint() {
-  action "${FUNCNAME[0]} ..."
   if which swiftlint >/dev/null; then
     if [ -e .swiftlint.yml ]; then
       sh command swiftlint lint --strict
@@ -216,7 +210,6 @@ function swiftlint() {
 }
 
 function pod-lib-lint() {
-  action "${FUNCNAME[0]} ..."
   if [ -e *.podspec ]; then
     sh pod lib lint --allow-warnings --verbose
   else
@@ -225,7 +218,6 @@ function pod-lib-lint() {
 }
 
 function pod-trunk-deploy() {
-  action "${FUNCNAME[0]} ..."
   sh pod trunk push *.podspec --allow-warnings --verbose
 }
 
@@ -271,5 +263,13 @@ if [ -z $ACTION ]; then
   exit 1
 fi
 
-setup_xcodeproj
-${ACTION}
+function main() {
+  setup_xcodeproj
+
+  echo "------------------------"
+  logger_cmd "Action: ${ACTION} ..."
+  echo "------------------------"
+  ${ACTION}
+}
+
+main
