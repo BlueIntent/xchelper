@@ -7,7 +7,7 @@ OUTPUT_DIR=$(mktemp -d -t xchelper-release)
 echo $OUTPUT_DIR
 git clone $upstream_github_url $OUTPUT_DIR
 cd $OUTPUT_DIR && make install && cd $PWD_DIR
-rsync -r $OUTPUT_DIR/build/package/* /usr/local/bin
+sudo rsync -r $OUTPUT_DIR/build/package/* /usr/local/bin
 rm -rf $OUTPUT_DIR
 echo "Successfully installed"
 xchelper --version
